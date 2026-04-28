@@ -1,5 +1,4 @@
-import { grade3Curriculum } from "@/data/grade3";
-import { grade2Curriculum } from "@/data/grade2";
+import { grade3 as g3Data, grade2 as g2Data } from "@/data/index";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
@@ -10,7 +9,7 @@ export default async function ChapterPage({
 }) {
   const { grade, chapterId } = await params;
   const curriculum =
-    grade === "3" ? grade3Curriculum : grade === "2" ? grade2Curriculum : null;
+    grade === "3" ? g3Data : grade === "2" ? g2Data : null;
   if (!curriculum) notFound();
 
   const chapter = curriculum.chapters.find((c) => c.id === chapterId);
