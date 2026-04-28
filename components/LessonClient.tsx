@@ -50,10 +50,10 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
     return (
       <div className="text-center py-10">
         <p className="text-4xl mb-3">{correct === total ? "🎉" : "📝"}</p>
-        <p className="text-xl font-bold text-slate-800 mb-1">
+        <p className="text-xl font-bold text-slate-100 mb-1">
           {correct} / {total} 正解
         </p>
-        <p className="text-slate-500 text-sm">
+        <p className="text-slate-400 text-sm">
           {correct === total
             ? "全問正解！このレッスンをクリアしました"
             : "復習してもう一度挑戦してみよう"}
@@ -65,19 +65,19 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-semibold text-slate-500">
+        <p className="text-sm font-semibold text-slate-400">
           問題 {current + 1} / {lesson.quizzes.length}
         </p>
-        <div className="h-2 bg-slate-100 rounded-full flex-1 mx-4">
+        <div className="h-2 bg-slate-700 rounded-full flex-1 mx-4">
           <div
-            className="h-2 bg-blue-400 rounded-full transition-all"
+            className="h-2 bg-blue-500 rounded-full transition-all"
             style={{ width: `${((current) / lesson.quizzes.length) * 100}%` }}
           />
         </div>
       </div>
 
-      <div className="bg-slate-50 rounded-xl p-5 mb-4">
-        <p className="font-semibold text-slate-800 text-base leading-relaxed">
+      <div className="bg-slate-700/50 rounded-xl p-5 mb-4">
+        <p className="font-semibold text-slate-100 text-base leading-relaxed">
           {quiz.question}
         </p>
       </div>
@@ -89,15 +89,15 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
           if (!submitted) {
             cls +=
               selected === opt.id
-                ? "border-blue-500 bg-blue-50 text-blue-800"
-                : "border-slate-200 bg-white text-slate-700 hover:border-blue-300";
+                ? "border-blue-500 bg-blue-900/40 text-blue-300"
+                : "border-slate-600 bg-slate-700/50 text-slate-200 hover:border-blue-500/60";
           } else {
             if (opt.id === quiz.correctAnswer) {
-              cls += "border-green-500 bg-green-50 text-green-800";
+              cls += "border-green-500 bg-green-900/40 text-green-300";
             } else if (opt.id === selected) {
-              cls += "border-red-400 bg-red-50 text-red-800";
+              cls += "border-red-500 bg-red-900/40 text-red-300";
             } else {
-              cls += "border-slate-100 bg-white text-slate-400";
+              cls += "border-slate-700 bg-slate-800 text-slate-500";
             }
           }
           return (
@@ -118,8 +118,8 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
         <div
           className={`rounded-xl p-4 mb-4 text-sm ${
             isCorrect
-              ? "bg-green-50 border border-green-200 text-green-800"
-              : "bg-red-50 border border-red-200 text-red-800"
+              ? "bg-green-900/40 border border-green-700 text-green-300"
+              : "bg-red-900/40 border border-red-700 text-red-300"
           }`}
         >
           <p className="font-bold mb-1">{isCorrect ? "正解！" : "不正解"}</p>
@@ -132,14 +132,14 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
           <button
             onClick={handleSubmit}
             disabled={!selected}
-            className="flex-1 bg-blue-600 text-white rounded-xl py-3 font-bold text-sm disabled:opacity-40 hover:bg-blue-700 transition-colors"
+            className="flex-1 bg-blue-600 text-white rounded-xl py-3 font-bold text-sm disabled:opacity-30 hover:bg-blue-500 transition-colors"
           >
             回答する
           </button>
         ) : (
           <button
             onClick={handleNext}
-            className="flex-1 bg-slate-800 text-white rounded-xl py-3 font-bold text-sm hover:bg-slate-700 transition-colors"
+            className="flex-1 bg-slate-600 text-white rounded-xl py-3 font-bold text-sm hover:bg-slate-500 transition-colors"
           >
             {current + 1 < lesson.quizzes.length ? "次の問題 →" : "結果を見る"}
           </button>
@@ -174,13 +174,13 @@ export default function LessonClient({
 
   return (
     <div>
-      <div className="flex gap-1 mb-6 bg-slate-100 rounded-xl p-1">
+      <div className="flex gap-1 mb-6 bg-slate-700/50 rounded-xl p-1">
         <button
           onClick={() => setTab("learn")}
           className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
             tab === "learn"
-              ? "bg-white text-blue-700 shadow-sm"
-              : "text-slate-500 hover:text-slate-700"
+              ? "bg-slate-600 text-blue-300 shadow-sm"
+              : "text-slate-400 hover:text-slate-200"
           }`}
         >
           解説を読む
@@ -189,8 +189,8 @@ export default function LessonClient({
           onClick={() => setTab("quiz")}
           className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
             tab === "quiz"
-              ? "bg-white text-blue-700 shadow-sm"
-              : "text-slate-500 hover:text-slate-700"
+              ? "bg-slate-600 text-blue-300 shadow-sm"
+              : "text-slate-400 hover:text-slate-200"
           }`}
         >
           確認問題 {completed && "✓"}
@@ -202,12 +202,12 @@ export default function LessonClient({
           <ContentView content={lesson.content} />
 
           {lesson.keyPoints.length > 0 && (
-            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <p className="text-sm font-bold text-blue-800 mb-2">ポイント</p>
+            <div className="mt-6 bg-blue-950/50 border border-blue-800 rounded-xl p-4">
+              <p className="text-sm font-bold text-blue-400 mb-2">ポイント</p>
               <ul className="space-y-1">
                 {lesson.keyPoints.map((kp, i) => (
-                  <li key={i} className="text-sm text-blue-700 flex gap-2">
-                    <span className="text-blue-400 flex-shrink-0">•</span>
+                  <li key={i} className="text-sm text-blue-300 flex gap-2">
+                    <span className="text-blue-500 flex-shrink-0">•</span>
                     {kp}
                   </li>
                 ))}
@@ -217,19 +217,19 @@ export default function LessonClient({
 
           {lesson.examples.length > 0 && (
             <div className="mt-4">
-              <p className="text-sm font-bold text-slate-600 mb-2">仕訳例</p>
+              <p className="text-sm font-bold text-slate-400 mb-2">仕訳例</p>
               <div className="flex flex-col gap-3">
                 {lesson.examples.map((ex, i) => (
-                  <div key={i} className="bg-white border border-slate-200 rounded-xl p-4">
-                    <p className="text-sm text-slate-600 mb-2">{ex.description}</p>
+                  <div key={i} className="bg-slate-700/50 border border-slate-600 rounded-xl p-4">
+                    <p className="text-sm text-slate-400 mb-2">{ex.description}</p>
                     <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="bg-blue-50 rounded-lg p-2">
-                        <p className="text-xs font-bold text-blue-500 mb-1">借方</p>
-                        <p className="text-slate-800 font-medium">{ex.debit}</p>
+                      <div className="bg-blue-900/40 rounded-lg p-2">
+                        <p className="text-xs font-bold text-blue-400 mb-1">借方</p>
+                        <p className="text-slate-100 font-medium">{ex.debit}</p>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-2">
+                      <div className="bg-slate-700 rounded-lg p-2">
                         <p className="text-xs font-bold text-slate-400 mb-1">貸方</p>
-                        <p className="text-slate-800 font-medium">{ex.credit}</p>
+                        <p className="text-slate-100 font-medium">{ex.credit}</p>
                       </div>
                     </div>
                   </div>
@@ -240,7 +240,7 @@ export default function LessonClient({
 
           <button
             onClick={() => setTab("quiz")}
-            className="mt-8 w-full bg-blue-600 text-white rounded-xl py-3 font-bold text-sm hover:bg-blue-700 transition-colors"
+            className="mt-8 w-full bg-blue-600 text-white rounded-xl py-3 font-bold text-sm hover:bg-blue-500 transition-colors"
           >
             確認問題を解く →
           </button>
@@ -257,11 +257,11 @@ export default function LessonClient({
         />
       )}
 
-      <div className="mt-8 pt-6 border-t border-slate-200 flex justify-between">
+      <div className="mt-8 pt-6 border-t border-slate-700 flex justify-between">
         {prevLessonId ? (
           <a
             href={`/grade/${grade}/chapter/${chapterId}/lesson/${prevLessonId}`}
-            className="text-sm text-slate-500 hover:text-blue-600 transition-colors"
+            className="text-sm text-slate-400 hover:text-blue-400 transition-colors"
           >
             ← 前のレッスン
           </a>
@@ -271,14 +271,14 @@ export default function LessonClient({
         {nextLessonId ? (
           <a
             href={`/grade/${grade}/chapter/${chapterId}/lesson/${nextLessonId}`}
-            className="text-sm text-slate-500 hover:text-blue-600 transition-colors"
+            className="text-sm text-slate-400 hover:text-blue-400 transition-colors"
           >
             次のレッスン →
           </a>
         ) : (
           <a
             href={`/grade/${grade}/chapter/${chapterId}`}
-            className="text-sm text-blue-600 font-semibold hover:text-blue-800 transition-colors"
+            className="text-sm text-blue-400 font-semibold hover:text-blue-300 transition-colors"
           >
             章一覧に戻る
           </a>

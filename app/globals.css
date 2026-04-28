@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #1e293b;
+  --background: #0f172a;
+  --foreground: #e2e8f0;
 }
 
 body {
@@ -14,28 +14,28 @@ body {
 .prose-boki h2 {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #f1f5f9;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #334155;
   padding-bottom: 0.25rem;
 }
 .prose-boki h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: #334155;
+  color: #cbd5e1;
   margin-top: 1rem;
   margin-bottom: 0.25rem;
 }
 .prose-boki p {
-  color: #475569;
+  color: #94a3b8;
   line-height: 1.75;
   margin-bottom: 0.75rem;
 }
 .prose-boki ul {
   list-style: disc;
   list-style-position: inside;
-  color: #475569;
+  color: #94a3b8;
   margin-bottom: 0.75rem;
 }
 .prose-boki li {
@@ -43,7 +43,7 @@ body {
 }
 .prose-boki strong {
   font-weight: 700;
-  color: #1e293b;
+  color: #f1f5f9;
 }
 .prose-boki table {
   width: 100%;
@@ -52,33 +52,33 @@ body {
   margin-bottom: 1rem;
 }
 .prose-boki th {
-  background: #f1f5f9;
-  color: #475569;
+  background: #1e293b;
+  color: #94a3b8;
   font-weight: 600;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #334155;
   text-align: left;
 }
 .prose-boki td {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #e2e8f0;
-  color: #475569;
+  border: 1px solid #334155;
+  color: #94a3b8;
 }
 .prose-boki code {
-  background: #f1f5f9;
+  background: #1e293b;
   border-radius: 0.25rem;
   padding: 0 0.25rem;
   font-size: 0.875rem;
   font-family: monospace;
-  color: #1e293b;
+  color: #e2e8f0;
 }
 .prose-boki pre {
-  background: #f1f5f9;
+  background: #1e293b;
   border-radius: 0.5rem;
   padding: 0.75rem;
   font-size: 0.875rem;
   font-family: monospace;
-  color: #1e293b;
+  color: #e2e8f0;
   margin-bottom: 0.75rem;
   overflow-x: auto;
   white-space: pre-wrap;

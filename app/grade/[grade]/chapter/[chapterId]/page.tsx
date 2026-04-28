@@ -28,9 +28,9 @@ export default async function ChapterPage({
       </div>
 
       <div className="mb-8">
-        <p className="text-xs font-bold text-slate-400 mb-1">Chapter {chapter.number}</p>
-        <h1 className="text-2xl font-bold text-slate-800">{chapter.title}</h1>
-        <p className="text-slate-500 mt-1">{chapter.description}</p>
+        <p className="text-xs font-bold text-slate-500 mb-1">Chapter {chapter.number}</p>
+        <h1 className="text-2xl font-bold text-slate-100">{chapter.title}</h1>
+        <p className="text-slate-400 mt-1">{chapter.description}</p>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -40,20 +40,20 @@ export default async function ChapterPage({
             <Link
               key={lesson.id}
               href={`/grade/${grade}/chapter/${chapterId}/lesson/${lesson.id}`}
-              className="bg-white rounded-xl border border-slate-200 p-5 flex items-center justify-between hover:border-blue-400 hover:shadow-md transition-all"
+              className="bg-slate-800 rounded-xl border border-slate-700 p-5 flex items-center justify-between hover:border-blue-500 hover:shadow-md hover:shadow-black/30 transition-all"
             >
               <div className="flex items-center gap-4">
-                <span className="w-9 h-9 rounded-full bg-blue-50 text-blue-700 font-bold text-sm flex items-center justify-center flex-shrink-0">
+                <span className="w-9 h-9 rounded-full bg-blue-900/50 text-blue-400 font-bold text-sm flex items-center justify-center flex-shrink-0">
                   {index + 1}
                 </span>
                 <div>
-                  <p className="font-semibold text-slate-800">{lesson.title}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="font-semibold text-slate-100">{lesson.title}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">
                     確認問題 {quizCount}問
                   </p>
                 </div>
               </div>
-              <span className="text-slate-300 text-lg">›</span>
+              <span className="text-slate-600 text-lg">›</span>
             </Link>
           );
         })}

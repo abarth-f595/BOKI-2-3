@@ -40,13 +40,13 @@ export default async function LessonPage({
       </div>
 
       <div className="mb-6">
-        <p className="text-xs font-bold text-slate-400 mb-1">
+        <p className="text-xs font-bold text-slate-500 mb-1">
           Ch.{chapter.number} — レッスン {lessonIndex + 1}
         </p>
-        <h1 className="text-xl font-bold text-slate-800">{lesson.title}</h1>
+        <h1 className="text-xl font-bold text-slate-100">{lesson.title}</h1>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-sm shadow-black/20">
         <LessonClient
           lesson={lesson}
           prevLessonId={prevLesson?.id}

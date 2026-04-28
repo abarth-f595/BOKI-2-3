@@ -23,36 +23,36 @@ function ChapterCard({
     0
   );
   const colors = [
-    "border-blue-200 hover:border-blue-400",
-    "border-teal-200 hover:border-teal-400",
-    "border-violet-200 hover:border-violet-400",
-    "border-amber-200 hover:border-amber-400",
-    "border-rose-200 hover:border-rose-400",
-    "border-cyan-200 hover:border-cyan-400",
-    "border-emerald-200 hover:border-emerald-400",
+    "border-blue-800 hover:border-blue-500",
+    "border-teal-800 hover:border-teal-500",
+    "border-violet-800 hover:border-violet-500",
+    "border-amber-800 hover:border-amber-500",
+    "border-rose-800 hover:border-rose-500",
+    "border-cyan-800 hover:border-cyan-500",
+    "border-emerald-800 hover:border-emerald-500",
   ];
   const color = colors[index % colors.length];
 
   return (
     <Link
       href={`/grade/${grade}/chapter/${chapter.id}`}
-      className={`bg-white rounded-xl border-2 ${color} p-5 flex flex-col gap-2 hover:shadow-md transition-all`}
+      className={`bg-slate-800 rounded-xl border-2 ${color} p-5 flex flex-col gap-2 hover:shadow-md hover:shadow-black/30 transition-all`}
     >
       <div className="flex items-center gap-2">
-        <span className="text-xs font-bold text-slate-400 bg-slate-100 rounded-full px-2 py-0.5">
+        <span className="text-xs font-bold text-slate-400 bg-slate-700 rounded-full px-2 py-0.5">
           Ch.{chapter.number}
         </span>
         {chapter.section && (
-          <span className="text-xs font-medium text-white bg-slate-500 rounded-full px-2 py-0.5">
+          <span className="text-xs font-medium text-slate-200 bg-slate-600 rounded-full px-2 py-0.5">
             {SECTION_LABEL[chapter.section]}
           </span>
         )}
       </div>
-      <h3 className="font-bold text-slate-800 text-base">{chapter.title}</h3>
-      <p className="text-sm text-slate-500 leading-relaxed">
+      <h3 className="font-bold text-slate-100 text-base">{chapter.title}</h3>
+      <p className="text-sm text-slate-400 leading-relaxed">
         {chapter.description}
       </p>
-      <div className="flex gap-3 mt-1 text-xs text-slate-400">
+      <div className="flex gap-3 mt-1 text-xs text-slate-500">
         <span>{lessonCount} レッスン</span>
         <span>{quizCount} 問題</span>
       </div>
@@ -87,14 +87,14 @@ export default async function GradePage({
           <span>/</span>
           <span>{curriculum.title}</span>
         </div>
-        <h1 className="text-2xl font-bold text-slate-800">{curriculum.title}</h1>
-        <p className="text-slate-500 mt-1">{curriculum.description}</p>
+        <h1 className="text-2xl font-bold text-slate-100">{curriculum.title}</h1>
+        <p className="text-slate-400 mt-1">{curriculum.description}</p>
       </div>
 
       {grade === "2" ? (
         <>
           <section className="mb-8">
-            <h2 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
               <span className="w-1 h-5 bg-blue-500 rounded-full inline-block" />
               商業簿記
             </h2>
@@ -106,7 +106,7 @@ export default async function GradePage({
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
               <span className="w-1 h-5 bg-orange-500 rounded-full inline-block" />
               工業簿記
             </h2>
