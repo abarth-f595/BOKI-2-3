@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Lesson } from "@/types";
 import { markLessonComplete, saveQuizResult, getLessonProgress } from "@/lib/progress";
 import { simpleMarkdown } from "@/lib/markdown";
@@ -21,7 +21,21 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
   const [finished, setFinished] = useState(false);
 
   const quiz = lesson.quizzes[current];
-  const isCorrect = selected === quiz?.correctAnswer;
+
+  const shuffledQuiz = useMemo(() => {
+    if (!quiz?.options) return quiz;
+    const shuffled = [...quiz.options].sort(() => Math.random() - 0.5);
+    const newOptions = shuffled.map((opt, i) => ({
+      ...opt,
+      id: String.fromCharCode(97 + i),
+    }));
+    const originalCorrectLabel = quiz.options.find((o) => o.id === quiz.correctAnswer)?.label;
+    const newCorrectId = newOptions.find((o) => o.label === originalCorrectLabel)?.id ?? quiz.correctAnswer;
+    return { ...quiz, options: newOptions, correctAnswer: newCorrectId };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current]);
+
+  const isCorrect = selected === shuffledQuiz?.correctAnswer;
 
   function handleSubmit() {
     if (!selected) return;
@@ -78,12 +92,12 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
 
       <div className="bg-slate-700/50 rounded-xl p-5 mb-4">
         <p className="font-semibold text-slate-100 text-base leading-relaxed">
-          {quiz.question}
+          {shuffledQuiz?.question}
         </p>
       </div>
 
       <div className="flex flex-col gap-3 mb-5">
-        {quiz.options?.map((opt) => {
+        {shuffledQuiz?.options?.map((opt) => {
           let cls =
             "rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all cursor-pointer ";
           if (!submitted) {
@@ -92,7 +106,7 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
                 ? "border-blue-500 bg-blue-900/40 text-blue-300"
                 : "border-slate-600 bg-slate-700/50 text-slate-200 hover:border-blue-500/60";
           } else {
-            if (opt.id === quiz.correctAnswer) {
+            if (opt.id === shuffledQuiz.correctAnswer) {
               cls += "border-green-500 bg-green-900/40 text-green-300";
             } else if (opt.id === selected) {
               cls += "border-red-500 bg-red-900/40 text-red-300";
@@ -123,7 +137,7 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
           }`}
         >
           <p className="font-bold mb-1">{isCorrect ? "正解！" : "不正解"}</p>
-          <p className="leading-relaxed">{quiz.explanation}</p>
+          <p className="leading-relaxed">{shuffledQuiz?.explanation}</p>
         </div>
       )}
 
