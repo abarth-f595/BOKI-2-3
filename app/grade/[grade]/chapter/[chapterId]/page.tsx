@@ -58,6 +58,16 @@ export default async function ChapterPage({
           );
         })}
       </div>
+
+      <div className="mt-8 flex justify-center">
+        <Link 
+          href={`/grade/${grade}`} 
+          className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors border border-slate-700 shadow-sm"
+        >
+          <span className="text-sm">◀</span> 
+          <span className="font-medium">前の画面に戻る</span>
+        </Link>
+      </div>
     </div>
   );
 }
