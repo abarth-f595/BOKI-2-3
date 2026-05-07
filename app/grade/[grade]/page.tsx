@@ -89,6 +89,15 @@ export default async function GradePage({
         </div>
         <h1 className="text-2xl font-bold text-slate-100">{curriculum.title}</h1>
         <p className="text-slate-400 mt-1">{curriculum.description}</p>
+
+        <Link
+          href={`/grade/${grade}/past-exam`}
+          className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600/20 hover:bg-amber-600/40 border border-amber-600/50 text-amber-300 rounded-xl font-semibold text-sm transition-all"
+        >
+          <span>📝</span>
+          <span>過去問演習（2023〜2024年度）</span>
+          <span className="ml-1 text-xs bg-amber-500/20 px-2 py-0.5 rounded-full">NEW</span>
+        </Link>
       </div>
 
       {grade === "2" ? (

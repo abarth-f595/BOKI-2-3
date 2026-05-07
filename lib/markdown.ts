@@ -1,5 +1,6 @@
 export function simpleMarkdown(text: string): string {
   return text
+    .replace(/==(.+?)==/g, '<span class="keyword-highlight">$1</span>')
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.+?)\*/g, "<em>$1</em>")
     .replace(/`(.+?)`/g, "<code>$1</code>")

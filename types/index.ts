@@ -56,3 +56,26 @@ export interface UserProgress {
   quizResults: Record<string, { correct: number; total: number }>;
   lastAccessed: Record<string, string>;
 }
+
+export type PastExamCategory =
+  | "仕訳"
+  | "補助簿"
+  | "勘定記入"
+  | "試算表"
+  | "精算表"
+  | "財務諸表"
+  | "工業簿記"
+  | "連結会計"
+  | "その他";
+
+export interface PastExamQuestion {
+  id: string;
+  year: number;
+  session: number;
+  category: PastExamCategory;
+  question: string;
+  type: "multiple" | "truefalse";
+  options?: QuizOption[];
+  correctAnswer: string;
+  explanation: string;
+}
