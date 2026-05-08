@@ -8,7 +8,7 @@ export default function Home() {
         スッキリわかる日商簿記に沿って、3級・2級を効率よく学ぼう
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl">
         <Link
           href="/grade/3"
           className="group bg-slate-800 rounded-2xl border border-slate-700 p-8 flex flex-col items-center hover:border-blue-500 hover:shadow-lg hover:shadow-blue-900/30 transition-all"
@@ -35,6 +35,20 @@ export default function Home() {
             商業簿記・工業簿記
           </span>
           <span className="mt-4 text-xs text-slate-500">全14章 / 24レッスン</span>
+        </Link>
+
+        <Link
+          href="/calculator"
+          className="group bg-slate-800 rounded-2xl border border-slate-700 p-8 flex flex-col items-center hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-900/30 transition-all sm:col-span-2"
+        >
+          <span className="text-5xl mb-4">🧮</span>
+          <span className="text-xl font-bold text-slate-100 group-hover:text-emerald-400">
+            実践！電卓問題
+          </span>
+          <span className="text-sm text-slate-400 mt-2">
+            残高試算表や精算表を作成する総合問題モード
+          </span>
+          <span className="mt-4 text-xs text-slate-500">ステップ解説付き</span>
         </Link>
       </div>
 
