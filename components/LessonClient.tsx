@@ -13,11 +13,11 @@ function ContentView({ content }: { content: string }) {
   );
 }
 
-function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
+function QuizSection({ lesson, onComplete, grade, chapterId }: { lesson: Lesson; onComplete: () => void; grade: string; chapterId: string }) {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
-  const [score, setScore] = useState(0);
+  const [scores, setScores] = useState<Record<number, boolean>>({});
   const [finished, setFinished] = useState(false);
 
   const quiz = lesson.quizzes[current];
@@ -39,7 +39,7 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
 
   function handleSubmit() {
     if (!selected) return;
-    if (isCorrect) setScore((s) => s + 1);
+    setScores(prev => ({ ...prev, [current]: isCorrect }));
     setSubmitted(true);
   }
 
@@ -50,7 +50,7 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
       setSubmitted(false);
     } else {
       const total = lesson.quizzes.length;
-      const correct = score + (isCorrect ? 1 : 0);
+      const correct = Object.values({ ...scores, [current]: isCorrect }).filter(Boolean).length;
       saveQuizResult(lesson.id, correct, total);
       if (correct === total) markLessonComplete(lesson.id);
       setFinished(true);
@@ -58,20 +58,42 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
     }
   }
 
+  function handlePrev() {
+    if (current > 0) {
+      setCurrent((c) => c - 1);
+      setSelected(null);
+      setSubmitted(false);
+    }
+  }
+
   if (finished) {
     const total = lesson.quizzes.length;
-    const correct = score + (isCorrect ? 1 : 0);
+    const correct = Object.values(scores).filter(Boolean).length;
     return (
       <div className="text-center py-10">
         <p className="text-4xl mb-3">{correct === total ? "🎉" : "📝"}</p>
         <p className="text-xl font-bold text-slate-100 mb-1">
           {correct} / {total} 正解
         </p>
-        <p className="text-slate-400 text-sm">
+        <p className="text-slate-400 text-sm mb-6">
           {correct === total
             ? "全問正解！このレッスンをクリアしました"
             : "復習してもう一度挑戦してみよう"}
         </p>
+        <div className="flex gap-4 justify-center">
+          <button
+            onClick={() => {
+              setCurrent(0);
+              setScores({});
+              setFinished(false);
+              setSelected(null);
+              setSubmitted(false);
+            }}
+            className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-xl transition-colors font-medium"
+          >
+            もう一度解く
+          </button>
+        </div>
       </div>
     );
   }
@@ -142,6 +164,14 @@ function QuizSection({ lesson, onComplete }: { lesson: Lesson; onComplete: () =>
       )}
 
       <div className="flex gap-3">
+        {current > 0 && (
+          <button
+            onClick={handlePrev}
+            className="bg-slate-700 text-slate-300 rounded-xl px-5 font-bold text-sm hover:bg-slate-600 transition-colors"
+          >
+            ◀ 前へ
+          </button>
+        )}
         {!submitted ? (
           <button
             onClick={handleSubmit}
@@ -264,6 +294,8 @@ export default function LessonClient({
       {tab === "quiz" && (
         <QuizSection
           lesson={lesson}
+          grade={grade}
+          chapterId={chapterId}
           onComplete={() => {
             setQuizDone(true);
             setCompleted(true);
@@ -271,31 +303,34 @@ export default function LessonClient({
         />
       )}
 
-      <div className="mt-8 pt-6 border-t border-slate-700 flex justify-between">
+      <div className="mt-8 pt-6 border-t border-slate-700 flex items-center justify-between">
         {prevLessonId ? (
           <a
             href={`/grade/${grade}/chapter/${chapterId}/lesson/${prevLessonId}`}
-            className="text-sm text-slate-400 hover:text-blue-400 transition-colors"
+            className="text-sm text-slate-400 hover:text-blue-400 transition-colors flex-1"
           >
             ← 前のレッスン
           </a>
         ) : (
-          <span />
+          <div className="flex-1" />
         )}
+        
+        <a
+          href={`/grade/${grade}/chapter/${chapterId}`}
+          className="text-sm text-slate-300 font-semibold hover:text-white bg-slate-700 px-4 py-2 rounded-lg transition-colors mx-2"
+        >
+          章一覧に戻る
+        </a>
+
         {nextLessonId ? (
           <a
             href={`/grade/${grade}/chapter/${chapterId}/lesson/${nextLessonId}`}
-            className="text-sm text-slate-400 hover:text-blue-400 transition-colors"
+            className="text-sm text-slate-400 hover:text-blue-400 transition-colors flex-1 text-right"
           >
             次のレッスン →
           </a>
         ) : (
-          <a
-            href={`/grade/${grade}/chapter/${chapterId}`}
-            className="text-sm text-blue-400 font-semibold hover:text-blue-300 transition-colors"
-          >
-            章一覧に戻る
-          </a>
+          <div className="flex-1" />
         )}
       </div>
     </div>
