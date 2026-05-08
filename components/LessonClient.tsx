@@ -101,7 +101,7 @@ function QuizSection({ lesson, onComplete, grade, chapterId }: { lesson: Lesson;
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-semibold text-slate-400">
+        <p className="text-sm font-semibold text-slate-400 whitespace-nowrap">
           問題 {current + 1} / {lesson.quizzes.length}
         </p>
         <div className="h-2 bg-slate-700 rounded-full flex-1 mx-4">
@@ -110,6 +110,12 @@ function QuizSection({ lesson, onComplete, grade, chapterId }: { lesson: Lesson;
             style={{ width: `${((current) / lesson.quizzes.length) * 100}%` }}
           />
         </div>
+        <a 
+          href="/" 
+          className="text-xs bg-slate-800 text-slate-300 hover:text-white border border-slate-600 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap font-medium flex items-center gap-1"
+        >
+          <span>🏠</span> ホーム
+        </a>
       </div>
 
       <div className="bg-slate-700/50 rounded-xl p-5 mb-4">
