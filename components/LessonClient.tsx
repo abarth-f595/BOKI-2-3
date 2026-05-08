@@ -303,34 +303,42 @@ export default function LessonClient({
         />
       )}
 
-      <div className="mt-8 pt-6 border-t border-slate-700 flex items-center justify-between">
+      <div className="mt-8 pt-6 border-t border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-4">
         {prevLessonId ? (
           <a
             href={`/grade/${grade}/chapter/${chapterId}/lesson/${prevLessonId}`}
-            className="text-sm text-slate-400 hover:text-blue-400 transition-colors flex-1"
+            className="text-sm text-slate-400 hover:text-blue-400 transition-colors flex-1 text-center sm:text-left"
           >
             ← 前のレッスン
           </a>
         ) : (
-          <div className="flex-1" />
+          <div className="flex-1 hidden sm:block" />
         )}
         
-        <a
-          href={`/grade/${grade}/chapter/${chapterId}`}
-          className="text-sm text-slate-300 font-semibold hover:text-white bg-slate-700 px-4 py-2 rounded-lg transition-colors mx-2"
-        >
-          章一覧に戻る
-        </a>
+        <div className="flex gap-3 justify-center">
+          <a
+            href={`/grade/${grade}/chapter/${chapterId}`}
+            className="text-sm text-slate-300 font-semibold hover:text-white bg-slate-700 px-4 py-2 rounded-lg transition-colors"
+          >
+            章一覧に戻る
+          </a>
+          <a
+            href="/"
+            className="text-sm text-slate-300 font-semibold hover:text-white bg-slate-800 border border-slate-600 px-4 py-2 rounded-lg transition-colors"
+          >
+            ホーム
+          </a>
+        </div>
 
         {nextLessonId ? (
           <a
             href={`/grade/${grade}/chapter/${chapterId}/lesson/${nextLessonId}`}
-            className="text-sm text-slate-400 hover:text-blue-400 transition-colors flex-1 text-right"
+            className="text-sm text-slate-400 hover:text-blue-400 transition-colors flex-1 text-center sm:text-right"
           >
             次のレッスン →
           </a>
         ) : (
-          <div className="flex-1" />
+          <div className="flex-1 hidden sm:block" />
         )}
       </div>
     </div>
