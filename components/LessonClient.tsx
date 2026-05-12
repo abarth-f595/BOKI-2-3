@@ -4,11 +4,13 @@ import { Lesson } from "@/types";
 import { markLessonComplete, saveQuizResult, getLessonProgress } from "@/lib/progress";
 import { simpleMarkdown } from "@/lib/markdown";
 import EizoukenGuide from "@/components/EizoukenGuide";
+import MemoryHookCard from "@/components/MemoryHookCard";
 import {
   EizoukenCharacter,
   getCharacterForChapter,
   pickLine,
 } from "@/data/characterDialogue";
+import { memoryHooks } from "@/data/memoryHooks";
 
 function ContentView({ content }: { content: string }) {
   return (
@@ -330,6 +332,16 @@ export default function LessonClient({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* 記憶術カード */}
+          {(memoryHooks[lesson.id] ?? []).length > 0 && (
+            <div className="mt-6">
+              <p className="text-sm font-bold text-yellow-400 mb-3">🧠 脳が「面白い！」と感じる記憶術</p>
+              {(memoryHooks[lesson.id] ?? []).map((hook, i) => (
+                <MemoryHookCard key={i} hook={hook} />
+              ))}
             </div>
           )}
 
