@@ -3,6 +3,12 @@ import { useState, useEffect, useMemo } from "react";
 import { Lesson } from "@/types";
 import { markLessonComplete, saveQuizResult, getLessonProgress } from "@/lib/progress";
 import { simpleMarkdown } from "@/lib/markdown";
+import EizoukenGuide from "@/components/EizoukenGuide";
+import {
+  EizoukenCharacter,
+  getCharacterForChapter,
+  pickLine,
+} from "@/data/characterDialogue";
 
 function ContentView({ content }: { content: string }) {
   return (
@@ -13,12 +19,25 @@ function ContentView({ content }: { content: string }) {
   );
 }
 
-function QuizSection({ lesson, onComplete, grade, chapterId }: { lesson: Lesson; onComplete: () => void; grade: string; chapterId: string }) {
+function QuizSection({
+  lesson,
+  onComplete,
+  grade,
+  chapterId,
+  character,
+}: {
+  lesson: Lesson;
+  onComplete: () => void;
+  grade: string;
+  chapterId: string;
+  character: EizoukenCharacter;
+}) {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [scores, setScores] = useState<Record<number, boolean>>({});
   const [finished, setFinished] = useState(false);
+  const [feedbackLine, setFeedbackLine] = useState("");
 
   const quiz = lesson.quizzes[current];
 
@@ -41,6 +60,9 @@ function QuizSection({ lesson, onComplete, grade, chapterId }: { lesson: Lesson;
     if (!selected) return;
     setScores(prev => ({ ...prev, [current]: isCorrect }));
     setSubmitted(true);
+    setFeedbackLine(
+      pickLine(isCorrect ? character.correctLines : character.wrongLines)
+    );
   }
 
   function handleNext() {
@@ -48,6 +70,7 @@ function QuizSection({ lesson, onComplete, grade, chapterId }: { lesson: Lesson;
       setCurrent((c) => c + 1);
       setSelected(null);
       setSubmitted(false);
+      setFeedbackLine("");
     } else {
       const total = lesson.quizzes.length;
       const correct = Object.values({ ...scores, [current]: isCorrect }).filter(Boolean).length;
@@ -63,6 +86,7 @@ function QuizSection({ lesson, onComplete, grade, chapterId }: { lesson: Lesson;
       setCurrent((c) => c - 1);
       setSelected(null);
       setSubmitted(false);
+      setFeedbackLine("");
     }
   }
 
@@ -88,6 +112,7 @@ function QuizSection({ lesson, onComplete, grade, chapterId }: { lesson: Lesson;
               setFinished(false);
               setSelected(null);
               setSubmitted(false);
+              setFeedbackLine("");
             }}
             className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-xl transition-colors font-medium"
           >
@@ -110,8 +135,8 @@ function QuizSection({ lesson, onComplete, grade, chapterId }: { lesson: Lesson;
             style={{ width: `${((current) / lesson.quizzes.length) * 100}%` }}
           />
         </div>
-        <a 
-          href="/" 
+        <a
+          href="/"
           className="text-xs bg-slate-800 text-slate-300 hover:text-white border border-slate-600 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap font-medium flex items-center gap-1"
         >
           <span>🏠</span> ホーム
@@ -156,6 +181,16 @@ function QuizSection({ lesson, onComplete, grade, chapterId }: { lesson: Lesson;
         })}
       </div>
 
+      {/* 回答後: キャラクターの解説コメント */}
+      {submitted && feedbackLine && (
+        <EizoukenGuide
+          character={character}
+          text={feedbackLine}
+          mode={isCorrect ? "correct" : "wrong"}
+        />
+      )}
+
+      {/* 既存の解説テキスト */}
       {submitted && (
         <div
           className={`rounded-xl p-4 mb-4 text-sm ${
@@ -216,6 +251,9 @@ export default function LessonClient({
   const [quizDone, setQuizDone] = useState(false);
   const [completed, setCompleted] = useState(false);
 
+  const character = getCharacterForChapter(chapterId);
+  const lectureLine = useMemo(() => pickLine(character.lectureLines), [character]);
+
   useEffect(() => {
     const prog = getLessonProgress(lesson.id);
     setCompleted(prog.completed);
@@ -249,6 +287,13 @@ export default function LessonClient({
 
       {tab === "learn" && (
         <div>
+          {/* キャラクター講義 */}
+          <EizoukenGuide
+            character={character}
+            text={lectureLine}
+            mode="lecture"
+          />
+
           <ContentView content={lesson.content} />
 
           {lesson.keyPoints.length > 0 && (
@@ -302,6 +347,7 @@ export default function LessonClient({
           lesson={lesson}
           grade={grade}
           chapterId={chapterId}
+          character={character}
           onComplete={() => {
             setQuizDone(true);
             setCompleted(true);
@@ -320,7 +366,7 @@ export default function LessonClient({
         ) : (
           <div className="flex-1 hidden sm:block" />
         )}
-        
+
         <div className="flex gap-3 justify-center">
           <a
             href={`/grade/${grade}/chapter/${chapterId}`}
