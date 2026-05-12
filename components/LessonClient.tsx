@@ -11,6 +11,7 @@ import {
   pickLine,
 } from "@/data/characterDialogue";
 import { memoryHooks } from "@/data/memoryHooks";
+import QuizDiagram from "@/components/QuizDiagram";
 
 function ContentView({ content }: { content: string }) {
   return (
@@ -145,6 +146,13 @@ function QuizSection({
         </a>
       </div>
 
+      {shuffledQuiz && !submitted && (
+        <QuizDiagram
+          question={shuffledQuiz.question}
+          explanation={shuffledQuiz.explanation}
+        />
+      )}
+
       <div className="bg-slate-700/50 rounded-xl p-5 mb-4">
         <p className="font-semibold text-slate-100 text-base leading-relaxed">
           {shuffledQuiz?.question}
@@ -189,6 +197,17 @@ function QuizSection({
           character={character}
           text={feedbackLine}
           mode={isCorrect ? "correct" : "wrong"}
+        />
+      )}
+
+      {/* 回答後の図解 */}
+      {submitted && shuffledQuiz && (
+        <QuizDiagram
+          question={shuffledQuiz.question}
+          explanation={shuffledQuiz.explanation}
+          isAnswered={true}
+          isCorrect={isCorrect}
+          correctLabel={shuffledQuiz.options?.find(o => o.id === shuffledQuiz.correctAnswer)?.label}
         />
       )}
 
