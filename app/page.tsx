@@ -39,7 +39,7 @@ export default function Home() {
 
         <Link
           href="/calculator"
-          className="group bg-slate-800 rounded-2xl border border-slate-700 p-8 flex flex-col items-center hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-900/30 transition-all sm:col-span-2"
+          className="group bg-slate-800 rounded-2xl border border-slate-700 p-8 flex flex-col items-center hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-900/30 transition-all"
         >
           <span className="text-5xl mb-4">🧮</span>
           <span className="text-xl font-bold text-slate-100 group-hover:text-emerald-400">
@@ -49,6 +49,20 @@ export default function Home() {
             残高試算表や精算表を作成する総合問題モード
           </span>
           <span className="mt-4 text-xs text-slate-500">ステップ解説付き</span>
+        </Link>
+
+        <Link
+          href="/journal-quiz"
+          className="group bg-slate-800 rounded-2xl border border-slate-700 p-8 flex flex-col items-center hover:border-violet-500 hover:shadow-lg hover:shadow-violet-900/30 transition-all"
+        >
+          <span className="text-5xl mb-4">✏️</span>
+          <span className="text-xl font-bold text-slate-100 group-hover:text-violet-400">
+            仕訳問題演習
+          </span>
+          <span className="text-sm text-slate-400 mt-2">
+            3級・2級（商業・工業）の仕訳を4択で練習
+          </span>
+          <span className="mt-4 text-xs text-slate-500">各500問以上・ランダム出題</span>
         </Link>
       </div>
 

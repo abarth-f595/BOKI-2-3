@@ -79,3 +79,12 @@ export interface PastExamQuestion {
   correctAnswer: string;
   explanation: string;
 }
+
+export interface JournalProblem {
+  id: string;
+  question: string;
+  options: [string, string, string, string];
+  correct: number;
+  explanation: string;
+  category: string;
+}
