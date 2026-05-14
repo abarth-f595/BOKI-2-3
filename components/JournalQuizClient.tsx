@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { JournalProblem } from "@/types";
 
@@ -46,6 +46,12 @@ function categoryColor(cat: string): string {
   return CATEGORY_COLORS[cat] ?? "bg-slate-700/50 text-slate-300 border-slate-600";
 }
 
+interface SavedProgress {
+  ids: string[];
+  current: number;
+  score: number;
+}
+
 export default function JournalQuizClient({
   problems,
   gradeLabel,
@@ -53,6 +59,8 @@ export default function JournalQuizClient({
   problems: JournalProblem[];
   gradeLabel: string;
 }) {
+  const storageKey = `jq-${gradeLabel}`;
+
   const [started, setStarted] = useState(false);
   const [shuffled, setShuffled] = useState<ShuffledProblem[]>([]);
   const [current, setCurrent] = useState(0);
@@ -60,21 +68,66 @@ export default function JournalQuizClient({
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [savedProgress, setSavedProgress] = useState<SavedProgress | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return;
+      const p: SavedProgress = JSON.parse(raw);
+      if (p.current > 0 && p.current < p.ids.length) {
+        setSavedProgress(p);
+      } else {
+        localStorage.removeItem(storageKey);
+      }
+    } catch {
+      // ignore
+    }
+  }, [storageKey]);
+
+  const problemMap = useMemo(
+    () => new Map(problems.map((p) => [p.id, p])),
+    [problems]
+  );
 
   const categories = useMemo(
     () => [...new Set(problems.map((p) => p.category))].sort(),
     [problems]
   );
 
-  const start = useCallback(() => {
-    setShuffled(shuffle(problems).map(buildShuffled));
-    setCurrent(0);
-    setSelected(null);
-    setSubmitted(false);
-    setScore(0);
-    setFinished(false);
-    setStarted(true);
-  }, [problems]);
+  const start = useCallback(
+    (resume: boolean) => {
+      let newShuffled: ShuffledProblem[];
+      let startIdx = 0;
+      let startScore = 0;
+
+      if (resume && savedProgress) {
+        const ordered = savedProgress.ids
+          .map((id) => problemMap.get(id))
+          .filter((p): p is JournalProblem => !!p);
+        newShuffled = ordered.map(buildShuffled);
+        startIdx = savedProgress.current;
+        startScore = savedProgress.score;
+      } else {
+        newShuffled = shuffle(problems).map(buildShuffled);
+        try {
+          const ids = newShuffled.map((s) => s.original.id);
+          localStorage.setItem(storageKey, JSON.stringify({ ids, current: 0, score: 0 }));
+        } catch {}
+      }
+
+      setShuffled(newShuffled);
+      setCurrent(startIdx);
+      setSelected(null);
+      setSubmitted(false);
+      setScore(startScore);
+      setFinished(false);
+      setShowExplanation(false);
+      setStarted(true);
+    },
+    [problems, savedProgress, problemMap, storageKey]
+  );
 
   function handleSelect(i: number) {
     if (!submitted) setSelected(i);
@@ -82,22 +135,31 @@ export default function JournalQuizClient({
 
   function handleSubmit() {
     if (selected === null) return;
-    if (shuffled[current].displayOptions[selected].isCorrect) {
-      setScore((s) => s + 1);
-    }
+    const isCorrect = shuffled[current].displayOptions[selected].isCorrect;
+    if (isCorrect) setScore((s) => s + 1);
     setSubmitted(true);
+    setShowExplanation(false);
   }
 
   function handleNext() {
-    if (current + 1 < shuffled.length) {
-      setCurrent((c) => c + 1);
+    const nextIdx = current + 1;
+    if (nextIdx < shuffled.length) {
+      try {
+        const ids = shuffled.map((s) => s.original.id);
+        localStorage.setItem(storageKey, JSON.stringify({ ids, current: nextIdx, score }));
+      } catch {}
+      setCurrent(nextIdx);
       setSelected(null);
       setSubmitted(false);
+      setShowExplanation(false);
     } else {
+      try { localStorage.removeItem(storageKey); } catch {}
+      setSavedProgress(null);
       setFinished(true);
     }
   }
 
+  // ── スタート画面 ──────────────────────────────────────────────────────────
   if (!started) {
     return (
       <div>
@@ -122,13 +184,22 @@ export default function JournalQuizClient({
           <ul className="text-sm text-slate-400 space-y-1 mb-6 list-disc list-inside">
             <li>仕訳の借方・貸方を4択で選ぶ形式です</li>
             <li>問題・選択肢はランダムにシャッフルされます</li>
-            <li>回答後に詳しい解説が表示されます</li>
+            <li>回答前でも解説を確認できます</li>
           </ul>
+
+          {savedProgress && (
+            <button
+              onClick={() => start(true)}
+              className="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition-colors mb-3"
+            >
+              続きから（{savedProgress.current}問目 / 正解 {savedProgress.score}問）
+            </button>
+          )}
           <button
-            onClick={start}
+            onClick={() => start(false)}
             className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors"
           >
-            演習スタート →
+            {savedProgress ? "最初から" : "演習スタート →"}
           </button>
         </div>
         <Link
@@ -141,6 +212,7 @@ export default function JournalQuizClient({
     );
   }
 
+  // ── 結果画面 ──────────────────────────────────────────────────────────────
   if (finished) {
     const total = shuffled.length;
     const pct = Math.round((score / total) * 100);
@@ -160,7 +232,7 @@ export default function JournalQuizClient({
         </p>
         <div className="flex flex-col gap-3 items-center">
           <button
-            onClick={start}
+            onClick={() => start(false)}
             className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors w-64"
           >
             もう一度（シャッフル）
@@ -182,6 +254,7 @@ export default function JournalQuizClient({
     );
   }
 
+  // ── 問題画面 ──────────────────────────────────────────────────────────────
   const item = shuffled[current];
   const correctIdx = item.displayOptions.findIndex((o) => o.isCorrect);
   const isCorrect = submitted && selected === correctIdx;
@@ -219,7 +292,7 @@ export default function JournalQuizClient({
       </div>
 
       {/* options */}
-      <div className="flex flex-col gap-3 mb-5">
+      <div className="flex flex-col gap-3 mb-4">
         {item.displayOptions.map((opt, i) => {
           const letter = String.fromCharCode(65 + i);
           let cls =
@@ -252,16 +325,32 @@ export default function JournalQuizClient({
         })}
       </div>
 
+      {/* explanation toggle (before submitting) */}
+      {!submitted && (
+        <button
+          onClick={() => setShowExplanation((v) => !v)}
+          className="text-xs text-slate-500 hover:text-slate-300 transition-colors mb-3 underline underline-offset-2"
+        >
+          {showExplanation ? "解説を隠す" : "解説を確認する"}
+        </button>
+      )}
+
       {/* explanation */}
-      {submitted && (
+      {(submitted || showExplanation) && (
         <div
           className={`rounded-xl p-5 mb-4 border ${
-            isCorrect ? "bg-green-900/30 border-green-700" : "bg-red-900/30 border-red-700"
+            submitted
+              ? isCorrect
+                ? "bg-green-900/30 border-green-700"
+                : "bg-red-900/30 border-red-700"
+              : "bg-slate-700/40 border-slate-600"
           }`}
         >
-          <p className={`font-bold text-base mb-2 ${isCorrect ? "text-green-300" : "text-red-300"}`}>
-            {isCorrect ? "✓ 正解！" : "✗ 不正解"}
-          </p>
+          {submitted && (
+            <p className={`font-bold text-base mb-2 ${isCorrect ? "text-green-300" : "text-red-300"}`}>
+              {isCorrect ? "✓ 正解！" : "✗ 不正解"}
+            </p>
+          )}
           <p className="text-sm text-slate-300 leading-relaxed">{item.original.explanation}</p>
         </div>
       )}
