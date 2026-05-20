@@ -5,14 +5,14 @@ import { markLessonComplete, saveQuizResult, getLessonProgress } from "@/lib/pro
 import { simpleMarkdown } from "@/lib/markdown";
 import EizoukenGuide from "@/components/EizoukenGuide";
 import MemoryHookCard from "@/components/MemoryHookCard";
+import QuizDiagram from "@/components/QuizDiagram";
+import AccountTitlesTable from "@/components/AccountTitlesTable";
 import {
   EizoukenCharacter,
   getCharacterForChapter,
   pickLine,
 } from "@/data/characterDialogue";
 import { memoryHooks } from "@/data/memoryHooks";
-import QuizDiagram from "@/components/QuizDiagram";
-import AccountTitlesTable from "@/components/AccountTitlesTable";
 
 function ContentView({ content }: { content: string }) {
   return (
@@ -147,8 +147,6 @@ function QuizSection({
         </a>
       </div>
 
-      <AccountTitlesTable />
-
       {shuffledQuiz && !submitted && (
         <QuizDiagram
           question={shuffledQuiz.question}
@@ -161,6 +159,8 @@ function QuizSection({
           {shuffledQuiz?.question}
         </p>
       </div>
+
+      <AccountTitlesTable />
 
       <div className="flex flex-col gap-3 mb-5">
         {shuffledQuiz?.options?.map((opt) => {
