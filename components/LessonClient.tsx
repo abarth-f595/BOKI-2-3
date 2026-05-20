@@ -12,6 +12,7 @@ import {
 } from "@/data/characterDialogue";
 import { memoryHooks } from "@/data/memoryHooks";
 import QuizDiagram from "@/components/QuizDiagram";
+import AccountTitlesTable from "@/components/AccountTitlesTable";
 
 function ContentView({ content }: { content: string }) {
   return (
@@ -145,6 +146,8 @@ function QuizSection({
           <span>🏠</span> ホーム
         </a>
       </div>
+
+      <AccountTitlesTable />
 
       {shuffledQuiz && !submitted && (
         <QuizDiagram
