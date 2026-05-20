@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { CalculatorProblem } from "@/data/calculator";
 import Link from "next/link";
+import FinancialStatementsGuide from "@/components/FinancialStatementsGuide";
 
 export default function CalculatorClient({ problem }: { problem: CalculatorProblem }) {
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
@@ -68,6 +69,7 @@ export default function CalculatorClient({ problem }: { problem: CalculatorProbl
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Pane: Transactions and Explanation */}
         <div className="flex flex-col gap-6">
+          <FinancialStatementsGuide accounts={Object.keys(problem.expectedAnswers)} />
           <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
             <h2 className="text-lg font-bold text-slate-100 mb-4 border-b border-slate-700 pb-2">
               取引一覧
