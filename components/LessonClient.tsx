@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
-import { Lesson } from "@/types";
+import { Lesson, Quiz } from "@/types";
 import { markLessonComplete, saveQuizResult, getLessonProgress } from "@/lib/progress";
 import { simpleMarkdown } from "@/lib/markdown";
 import EizoukenGuide from "@/components/EizoukenGuide";
@@ -13,6 +13,59 @@ import {
   pickLine,
 } from "@/data/characterDialogue";
 import { memoryHooks } from "@/data/memoryHooks";
+import { getQuizDifficulty } from "@/lib/difficulty";
+
+type LessonDifficulty = "normal" | "hard";
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function DifficultySelectorLesson({
+  quizzes,
+  onSelect,
+}: {
+  quizzes: Quiz[];
+  onSelect: (d: LessonDifficulty) => void;
+}) {
+  const normalCount = quizzes.filter(
+    (q) => getQuizDifficulty(q) === "easy" || getQuizDifficulty(q) === "normal"
+  ).length;
+  const hardCount = quizzes.filter(
+    (q) => getQuizDifficulty(q) === "hard" || getQuizDifficulty(q) === "oni"
+  ).length;
+
+  return (
+    <div className="space-y-4">
+      <p className="text-center text-slate-400 text-sm">難易度を選んでください</p>
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          onClick={() => onSelect("normal")}
+          disabled={normalCount === 0}
+          className="bg-blue-900/30 border-2 border-blue-600 rounded-2xl p-4 text-left hover:brightness-110 transition-all hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+        >
+          <div className="text-2xl mb-1">📝</div>
+          <div className="font-bold text-blue-300 text-base">ふつう</div>
+          <div className="text-xs text-slate-500 mt-1">{normalCount} 問</div>
+        </button>
+        <button
+          onClick={() => onSelect("hard")}
+          disabled={hardCount === 0}
+          className="bg-amber-900/30 border-2 border-amber-600 rounded-2xl p-4 text-left hover:brightness-110 transition-all hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+        >
+          <div className="text-2xl mb-1">🔥</div>
+          <div className="font-bold text-amber-300 text-base">むずかしい</div>
+          <div className="text-xs text-slate-500 mt-1">{hardCount} 問</div>
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function ContentView({ content }: { content: string }) {
   return (
@@ -22,6 +75,8 @@ function ContentView({ content }: { content: string }) {
     />
   );
 }
+
+const LESSON_QUIZ_COUNT = 100;
 
 function QuizSection({
   lesson,
@@ -36,6 +91,18 @@ function QuizSection({
   chapterId: string;
   character: EizoukenCharacter;
 }) {
+  const [difficulty, setDifficulty] = useState<LessonDifficulty | null>(null);
+
+  const pool = useMemo(() => {
+    if (!difficulty) return [];
+    const filtered = lesson.quizzes.filter((q) => {
+      const d = getQuizDifficulty(q);
+      return difficulty === "normal" ? d === "easy" || d === "normal" : d === "hard" || d === "oni";
+    });
+    return shuffle(filtered).slice(0, LESSON_QUIZ_COUNT);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [difficulty]);
+
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -43,7 +110,20 @@ function QuizSection({
   const [finished, setFinished] = useState(false);
   const [feedbackLine, setFeedbackLine] = useState("");
 
-  const quiz = lesson.quizzes[current];
+  function handleSelectDifficulty(d: LessonDifficulty) {
+    setDifficulty(d);
+    setCurrent(0);
+    setSelected(null);
+    setSubmitted(false);
+    setScores({});
+    setFinished(false);
+  }
+
+  if (!difficulty) {
+    return <DifficultySelectorLesson quizzes={lesson.quizzes} onSelect={handleSelectDifficulty} />;
+  }
+
+  const quiz = pool[current];
 
   const shuffledQuiz = useMemo(() => {
     if (!quiz?.options) return quiz;
@@ -70,13 +150,13 @@ function QuizSection({
   }
 
   function handleNext() {
-    if (current + 1 < lesson.quizzes.length) {
+    if (current + 1 < pool.length) {
       setCurrent((c) => c + 1);
       setSelected(null);
       setSubmitted(false);
       setFeedbackLine("");
     } else {
-      const total = lesson.quizzes.length;
+      const total = pool.length;
       const correct = Object.values({ ...scores, [current]: isCorrect }).filter(Boolean).length;
       saveQuizResult(lesson.id, correct, total);
       if (correct === total) markLessonComplete(lesson.id);
@@ -95,34 +175,49 @@ function QuizSection({
   }
 
   if (finished) {
-    const total = lesson.quizzes.length;
+    const total = pool.length;
     const correct = Object.values(scores).filter(Boolean).length;
+    const pct = Math.round((correct / total) * 100);
     return (
       <div className="text-center py-10">
-        <p className="text-4xl mb-3">{correct === total ? "🎉" : "📝"}</p>
+        <p className="text-4xl mb-3">{pct >= 80 ? "🎉" : "📝"}</p>
         <p className="text-xl font-bold text-slate-100 mb-1">
-          {correct} / {total} 正解
+          {correct} / {total} 正解（{pct}%）
         </p>
         <p className="text-slate-400 text-sm mb-6">
-          {correct === total
-            ? "全問正解！このレッスンをクリアしました"
+          {pct >= 80
+            ? "素晴らしい！このレッスンをクリアしました"
             : "復習してもう一度挑戦してみよう"}
         </p>
-        <div className="flex gap-4 justify-center">
+        <div className="flex gap-3 justify-center flex-wrap">
           <button
-            onClick={() => {
-              setCurrent(0);
-              setScores({});
-              setFinished(false);
-              setSelected(null);
-              setSubmitted(false);
-              setFeedbackLine("");
-            }}
-            className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-xl transition-colors font-medium"
+            onClick={() => handleSelectDifficulty(difficulty)}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-xl transition-colors font-medium"
           >
             もう一度解く
           </button>
+          <button
+            onClick={() => setDifficulty(null)}
+            className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-xl transition-colors font-medium"
+          >
+            難易度を変える
+          </button>
         </div>
+      </div>
+    );
+  }
+
+  if (pool.length === 0) {
+    return (
+      <div className="text-center py-10">
+        <p className="text-3xl mb-3">😅</p>
+        <p className="text-slate-300 mb-4">この難易度の問題はまだありません</p>
+        <button
+          onClick={() => setDifficulty(null)}
+          className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-xl transition-colors font-medium"
+        >
+          難易度を選び直す
+        </button>
       </div>
     );
   }
@@ -130,13 +225,18 @@ function QuizSection({
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-semibold text-slate-400 whitespace-nowrap">
-          問題 {current + 1} / {lesson.quizzes.length}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-semibold text-slate-400 whitespace-nowrap">
+            問題 {current + 1} / {pool.length}
+          </p>
+          <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${difficulty === "normal" ? "bg-blue-900/40 text-blue-300" : "bg-amber-900/40 text-amber-300"}`}>
+            {difficulty === "normal" ? "ふつう" : "むずかしい"}
+          </span>
+        </div>
         <div className="h-2 bg-slate-700 rounded-full flex-1 mx-4">
           <div
             className="h-2 bg-blue-500 rounded-full transition-all"
-            style={{ width: `${((current) / lesson.quizzes.length) * 100}%` }}
+            style={{ width: `${((current) / pool.length) * 100}%` }}
           />
         </div>
         <a
@@ -250,7 +350,7 @@ function QuizSection({
             onClick={handleNext}
             className="flex-1 bg-slate-600 text-white rounded-xl py-3 font-bold text-sm hover:bg-slate-500 transition-colors"
           >
-            {current + 1 < lesson.quizzes.length ? "次の問題 →" : "結果を見る"}
+            {current + 1 < pool.length ? "次の問題 →" : "結果を見る"}
           </button>
         )}
       </div>

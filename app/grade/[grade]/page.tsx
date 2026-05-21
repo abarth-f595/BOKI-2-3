@@ -70,13 +70,6 @@ export default async function GradePage({
     grade === "3" ? g3Data : grade === "2" ? g2Data : null;
   if (!curriculum) notFound();
 
-  const commercialChapters = curriculum.chapters.filter(
-    (c) => !c.section || c.section === "commercial"
-  );
-  const manufacturingChapters = curriculum.chapters.filter(
-    (c) => c.section === "manufacturing"
-  );
-
   return (
     <div>
       <div className="mb-8">
@@ -109,39 +102,11 @@ export default async function GradePage({
         </div>
       </div>
 
-      {grade === "2" ? (
-        <>
-          <section className="mb-8">
-            <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
-              <span className="w-1 h-5 bg-blue-500 rounded-full inline-block" />
-              商業簿記
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {commercialChapters.map((ch, i) => (
-                <ChapterCard key={ch.id} chapter={ch} grade={grade} index={i} />
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
-              <span className="w-1 h-5 bg-orange-500 rounded-full inline-block" />
-              工業簿記
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {manufacturingChapters.map((ch, i) => (
-                <ChapterCard key={ch.id} chapter={ch} grade={grade} index={i} />
-              ))}
-            </div>
-          </section>
-        </>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {curriculum.chapters.map((ch, i) => (
-            <ChapterCard key={ch.id} chapter={ch} grade={grade} index={i} />
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {curriculum.chapters.map((ch, i) => (
+          <ChapterCard key={ch.id} chapter={ch} grade={grade} index={i} />
+        ))}
+      </div>
     </div>
   );
 }
