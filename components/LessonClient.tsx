@@ -160,7 +160,7 @@ function QuizSection({
         </p>
       </div>
 
-      <AccountTitlesTable />
+      <AccountTitlesTable grade={grade} />
 
       <div className="flex flex-col gap-3 mb-5">
         {shuffledQuiz?.options?.map((opt) => {
