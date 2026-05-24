@@ -119,10 +119,6 @@ function QuizSection({
     setFinished(false);
   }
 
-  if (!difficulty) {
-    return <DifficultySelectorLesson quizzes={lesson.quizzes} onSelect={handleSelectDifficulty} />;
-  }
-
   const quiz = pool[current];
 
   const shuffledQuiz = useMemo(() => {
@@ -136,7 +132,11 @@ function QuizSection({
     const newCorrectId = newOptions.find((o) => o.label === originalCorrectLabel)?.id ?? quiz.correctAnswer;
     return { ...quiz, options: newOptions, correctAnswer: newCorrectId };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current]);
+  }, [current, difficulty]);
+
+  if (!difficulty) {
+    return <DifficultySelectorLesson quizzes={lesson.quizzes} onSelect={handleSelectDifficulty} />;
+  }
 
   const isCorrect = selected === shuffledQuiz?.correctAnswer;
 

@@ -6,6 +6,8 @@ import { grade3ExtraV2 } from "./grade3-extra-v2";
 import { grade3DifficultyExtra } from "./grade3-difficulty-extra";
 import { grade3BulkCh0105 } from "./grade3-bulk-ch01-05";
 import { grade3BulkCh0610 } from "./grade3-bulk-ch06-10";
+import { grade3BulkNewLessons } from "./grade3-bulk-new-lessons";
+import { grade3BulkCh1114 } from "./grade3-bulk-ch11-14";
 import { grade2Extra } from "./grade2-extra";
 import { grade2BulkCh0103 } from "./grade2-bulk-ch01-03";
 import { grade2BulkCh0406 } from "./grade2-bulk-ch04-06";
@@ -20,6 +22,8 @@ const grade3AllExtra = {
   ...grade3DifficultyExtra,
   ...grade3BulkCh0105,
   ...grade3BulkCh0610,
+  ...grade3BulkNewLessons,
+  ...grade3BulkCh1114,
 };
 
 // 同一レッスンへの追加問題をマージ（キーが重複した場合は配列結合）
