@@ -21,7 +21,7 @@ export const EIZOUKEN_CHARACTERS: Record<CharacterId, EizoukenCharacter> = {
   asagusa: {
     id: "asagusa",
     name: "浅草みどり",
-    imagePath: "/characters/asagusa.png",
+    imagePath: "/characters/asakusa-midori.png",
     color: "#4caf50",
     bgColor: "rgba(76,175,80,0.15)",
     initial: "浅",
@@ -44,7 +44,7 @@ export const EIZOUKEN_CHARACTERS: Record<CharacterId, EizoukenCharacter> = {
   mizusaki: {
     id: "mizusaki",
     name: "水崎ツバメ",
-    imagePath: "/characters/mizusaki.png",
+    imagePath: "/characters/mizusaki-tsubame.png",
     color: "#42a5f5",
     bgColor: "rgba(66,165,245,0.15)",
     initial: "水",
@@ -67,7 +67,7 @@ export const EIZOUKEN_CHARACTERS: Record<CharacterId, EizoukenCharacter> = {
   kanamori: {
     id: "kanamori",
     name: "金森さやか",
-    imagePath: "/characters/kanamori.png",
+    imagePath: "/characters/kanamori-sayaka.png",
     color: "#ff9800",
     bgColor: "rgba(255,152,0,0.15)",
     initial: "金",

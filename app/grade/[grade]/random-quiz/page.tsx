@@ -36,21 +36,36 @@ export default async function RandomQuizPage({
           {curriculum.title}
         </Link>
         <span>/</span>
-        <span>ランダム100問チャレンジ</span>
+        <span>ランダムチャレンジ</span>
       </div>
 
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-100">
-          🎲 ランダム100問チャレンジ
+          🎲 ランダムチャレンジ
         </h1>
         <p className="text-slate-400 mt-1 text-sm">
-          {curriculum.title}の全{allQuizzes.length}問からランダムに100問を出題します。
+          {curriculum.title}の全{allQuizzes.length}問からランダムに出題します。
           問題の選択肢もシャッフルされます。
         </p>
       </div>
 
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-sm shadow-black/20">
         <RandomQuizClient quizzes={allQuizzes} grade={grade} />
+      </div>
+
+      <div className="mt-6 pt-5 border-t border-slate-700 flex gap-3 justify-center flex-wrap">
+        <a
+          href={`/grade/${grade}`}
+          className="text-sm text-slate-300 font-semibold hover:text-white bg-slate-700 px-4 py-2 rounded-lg transition-colors"
+        >
+          日商簿記{grade}級に戻る
+        </a>
+        <a
+          href="/"
+          className="text-sm text-slate-300 font-semibold hover:text-white bg-slate-800 border border-slate-600 px-4 py-2 rounded-lg transition-colors"
+        >
+          ホーム
+        </a>
       </div>
     </div>
   );

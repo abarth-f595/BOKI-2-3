@@ -1,13 +1,18 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Quiz } from "@/types";
 import {
   getQuizDifficulty,
   DIFFICULTY_CONFIG,
   type Difficulty,
 } from "@/lib/difficulty";
+import CharacterReaction from "@/components/CharacterReaction";
+import AccountElementsMap from "@/components/AccountElementsMap";
 
-const QUIZ_COUNT = 100;
+const DEFAULT_QUIZ_COUNT = 20;
+const QUIZ_COUNT_OPTIONS = [10, 20, 30, 50] as const;
+type QuizCountOption = (typeof QUIZ_COUNT_OPTIONS)[number];
+const LS_QUIZ_COUNT = "rq-quiz-count";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -23,9 +28,13 @@ type QuizWithMeta = Quiz & { lessonTitle: string };
 function DifficultySelector({
   quizzes,
   onSelect,
+  quizCount,
+  onCountChange,
 }: {
   quizzes: QuizWithMeta[];
   onSelect: (d: Difficulty) => void;
+  quizCount: QuizCountOption;
+  onCountChange: (n: QuizCountOption) => void;
 }) {
   const countByDifficulty = useMemo(() => {
     const counts: Record<Difficulty, number> = {
@@ -44,36 +53,68 @@ function DifficultySelector({
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <p className="text-slate-300 text-sm">難易度を選んでスタート</p>
+      {/* 出題数選択 */}
+      <div>
+        <p className="text-slate-300 text-sm font-semibold mb-3">
+          出題数を選んでください
+        </p>
+        <div className="grid grid-cols-4 gap-2">
+          {QUIZ_COUNT_OPTIONS.map((n) => {
+            const isSelected = quizCount === n;
+            return (
+              <button
+                key={n}
+                onClick={() => onCountChange(n)}
+                aria-label={`出題数 ${n}問を選択`}
+                aria-pressed={isSelected}
+                className={`rounded-xl py-2.5 text-sm font-bold border-2 transition-all ${
+                  isSelected
+                    ? "bg-blue-600 border-blue-400 text-white shadow-lg shadow-blue-900/40 scale-[1.03]"
+                    : "bg-slate-800 border-slate-600 text-slate-300 hover:border-slate-400 hover:text-slate-100"
+                }`}
+              >
+                {isSelected && <span className="mr-1">✓</span>}
+                {n}問
+              </button>
+            );
+          })}
+        </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {order.map((d) => {
-          const cfg = DIFFICULTY_CONFIG[d];
-          const count = countByDifficulty[d];
-          const available = Math.min(count, QUIZ_COUNT);
-          return (
-            <button
-              key={d}
-              onClick={() => onSelect(d)}
-              disabled={count === 0}
-              className={`${cfg.bg} border-2 ${cfg.border} rounded-2xl p-5 text-left transition-all hover:scale-[1.02] hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100`}
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-3xl">{cfg.emoji}</span>
-                <span className={`text-lg font-bold ${cfg.text}`}>
-                  {cfg.label}
-                </span>
-              </div>
-              <p className="text-slate-400 text-xs leading-relaxed mb-3">
-                {cfg.desc}
-              </p>
-              <p className="text-slate-500 text-xs">
-                {count} 問中 {available} 問出題
-              </p>
-            </button>
-          );
-        })}
+
+      {/* 難易度選択 */}
+      <div>
+        <p className="text-slate-300 text-sm font-semibold mb-3">
+          難易度を選んでスタート
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {order.map((d) => {
+            const cfg = DIFFICULTY_CONFIG[d];
+            const count = countByDifficulty[d];
+            const available = Math.min(count, quizCount);
+            return (
+              <button
+                key={d}
+                onClick={() => onSelect(d)}
+                disabled={count === 0}
+                aria-label={`難易度 ${cfg.label} ${available}問でスタート`}
+                className={`${cfg.bg} border-2 ${cfg.border} rounded-2xl p-5 text-left transition-all hover:scale-[1.02] hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100`}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-3xl">{cfg.emoji}</span>
+                  <span className={`text-lg font-bold ${cfg.text}`}>
+                    {cfg.label}
+                  </span>
+                </div>
+                <p className="text-slate-400 text-xs leading-relaxed mb-3">
+                  {cfg.desc}
+                </p>
+                <p className="text-slate-500 text-xs">
+                  {count} 問中 {available} 問出題
+                </p>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -86,16 +127,31 @@ export default function RandomQuizClient({
   quizzes: QuizWithMeta[];
   grade: string;
 }) {
+  const [quizCount, setQuizCount] = useState<QuizCountOption>(DEFAULT_QUIZ_COUNT);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
+
+  // localStorage から出題数を復元
+  useEffect(() => {
+    const saved = localStorage.getItem(LS_QUIZ_COUNT);
+    const parsed = Number(saved);
+    if ((QUIZ_COUNT_OPTIONS as readonly number[]).includes(parsed)) {
+      setQuizCount(parsed as QuizCountOption);
+    }
+  }, []);
+
+  function handleCountChange(n: QuizCountOption) {
+    setQuizCount(n);
+    localStorage.setItem(LS_QUIZ_COUNT, String(n));
+  }
 
   const pool = useMemo(() => {
     if (!difficulty) return [];
     const filtered = quizzes.filter(
       (q) => getQuizDifficulty(q) === difficulty
     );
-    return shuffle(filtered).slice(0, QUIZ_COUNT);
+    return shuffle(filtered).slice(0, quizCount);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [difficulty]);
+  }, [difficulty, quizCount]);
 
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -158,7 +214,14 @@ export default function RandomQuizClient({
   const correctCount = Object.values(scores).filter(Boolean).length;
 
   if (!difficulty) {
-    return <DifficultySelector quizzes={quizzes} onSelect={handleSelectDifficulty} />;
+    return (
+      <DifficultySelector
+        quizzes={quizzes}
+        onSelect={handleSelectDifficulty}
+        quizCount={quizCount}
+        onCountChange={handleCountChange}
+      />
+    );
   }
 
   const cfg = DIFFICULTY_CONFIG[difficulty];
@@ -229,12 +292,15 @@ export default function RandomQuizClient({
         <div className="flex items-center gap-2">
           <span className="text-xl">{cfg.emoji}</span>
           <span className={`text-sm font-bold ${cfg.text}`}>{cfg.label}</span>
+          <span className="text-xs text-slate-500 bg-slate-800 rounded-md px-2 py-0.5">
+            {quizCount}問
+          </span>
         </div>
         <button
           onClick={handleRestart}
           className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
         >
-          難易度を変える
+          設定を変える
         </button>
       </div>
 
@@ -258,6 +324,9 @@ export default function RandomQuizClient({
       <p className="text-xs text-slate-500 bg-slate-800 rounded-lg px-3 py-1 inline-block">
         📚 {quiz.lessonTitle}
       </p>
+
+      {/* 5要素マップ */}
+      <AccountElementsMap grade={grade} />
 
       {/* Question */}
       <div className={`bg-slate-800/80 rounded-xl p-5 border ${cfg.border} border-opacity-40`}>
@@ -302,6 +371,9 @@ export default function RandomQuizClient({
           })}
         </div>
       )}
+
+      {/* キャラクターリアクション */}
+      {submitted && <CharacterReaction isCorrect={isCorrect} />}
 
       {/* Explanation */}
       {submitted && (

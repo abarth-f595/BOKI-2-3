@@ -4,9 +4,10 @@ import { Lesson, Quiz } from "@/types";
 import { markLessonComplete, saveQuizResult, getLessonProgress } from "@/lib/progress";
 import { simpleMarkdown } from "@/lib/markdown";
 import EizoukenGuide from "@/components/EizoukenGuide";
+import CharacterReaction from "@/components/CharacterReaction";
 import MemoryHookCard from "@/components/MemoryHookCard";
 import QuizDiagram from "@/components/QuizDiagram";
-import AccountTitlesTable from "@/components/AccountTitlesTable";
+import AccountElementsMap from "@/components/AccountElementsMap";
 import {
   EizoukenCharacter,
   getCharacterForChapter,
@@ -83,13 +84,11 @@ function QuizSection({
   onComplete,
   grade,
   chapterId,
-  character,
 }: {
   lesson: Lesson;
   onComplete: () => void;
   grade: string;
   chapterId: string;
-  character: EizoukenCharacter;
 }) {
   const [difficulty, setDifficulty] = useState<LessonDifficulty | null>(null);
 
@@ -108,7 +107,6 @@ function QuizSection({
   const [submitted, setSubmitted] = useState(false);
   const [scores, setScores] = useState<Record<number, boolean>>({});
   const [finished, setFinished] = useState(false);
-  const [feedbackLine, setFeedbackLine] = useState("");
 
   function handleSelectDifficulty(d: LessonDifficulty) {
     setDifficulty(d);
@@ -144,9 +142,6 @@ function QuizSection({
     if (!selected) return;
     setScores(prev => ({ ...prev, [current]: isCorrect }));
     setSubmitted(true);
-    setFeedbackLine(
-      pickLine(isCorrect ? character.correctLines : character.wrongLines)
-    );
   }
 
   function handleNext() {
@@ -154,7 +149,6 @@ function QuizSection({
       setCurrent((c) => c + 1);
       setSelected(null);
       setSubmitted(false);
-      setFeedbackLine("");
     } else {
       const total = pool.length;
       const correct = Object.values({ ...scores, [current]: isCorrect }).filter(Boolean).length;
@@ -170,7 +164,6 @@ function QuizSection({
       setCurrent((c) => c - 1);
       setSelected(null);
       setSubmitted(false);
-      setFeedbackLine("");
     }
   }
 
@@ -260,7 +253,7 @@ function QuizSection({
         </p>
       </div>
 
-      <AccountTitlesTable grade={grade} />
+      <AccountElementsMap grade={grade} />
 
       <div className="flex flex-col gap-3 mb-5">
         {shuffledQuiz?.options?.map((opt) => {
@@ -295,13 +288,7 @@ function QuizSection({
       </div>
 
       {/* 回答後: キャラクターの解説コメント */}
-      {submitted && feedbackLine && (
-        <EizoukenGuide
-          character={character}
-          text={feedbackLine}
-          mode={isCorrect ? "correct" : "wrong"}
-        />
-      )}
+      {submitted && <CharacterReaction isCorrect={isCorrect} />}
 
       {/* 回答後の図解 */}
       {submitted && shuffledQuiz && (
@@ -481,7 +468,6 @@ export default function LessonClient({
           lesson={lesson}
           grade={grade}
           chapterId={chapterId}
-          character={character}
           onComplete={() => {
             setQuizDone(true);
             setCompleted(true);
