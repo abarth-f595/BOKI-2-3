@@ -4,6 +4,7 @@ import { grade3WsProblems } from "./calc/grade3-ws";
 import { grade3FsProblems } from "./calc/grade3-fs";
 import { grade3AdjProblems } from "./calc/grade3-adj";
 import { grade2TbProblems } from "./calc/grade2-tb";
+import { grade2WsProblems } from "./calc/grade2-ws";
 
 export type CalcStep = {
   id: string;
@@ -37,6 +38,7 @@ export const calculatorProblems: CalculatorProblem[] = [
   ...grade3FsProblems,
   ...grade3AdjProblems,
   ...grade2TbProblems,
+  ...grade2WsProblems,
   {
     id: "trial-balance-01",
     title: "残高試算表の作成（基礎）",
