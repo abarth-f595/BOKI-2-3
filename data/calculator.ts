@@ -6,6 +6,7 @@ import { grade3AdjProblems } from "./calc/grade3-adj";
 import { grade2TbProblems } from "./calc/grade2-tb";
 import { grade2WsProblems } from "./calc/grade2-ws";
 import { grade2FsProblems } from "./calc/grade2-fs";
+import { grade2BrProblems } from "./calc/grade2-br";
 
 export type CalcStep = {
   id: string;
@@ -19,7 +20,7 @@ export type CalculatorProblem = {
   id: string;
   title: string;
   level: "3級" | "2級";
-  type: "残高試算表" | "合計試算表" | "精算表" | "財務諸表" | "決算整理";
+  type: "残高試算表" | "合計試算表" | "精算表" | "財務諸表" | "決算整理" | "本支店";
   description: string;
   transactions: {
     id: string;
@@ -41,6 +42,7 @@ export const calculatorProblems: CalculatorProblem[] = [
   ...grade2TbProblems,
   ...grade2WsProblems,
   ...grade2FsProblems,
+  ...grade2BrProblems,
   {
     id: "trial-balance-01",
     title: "残高試算表の作成（基礎）",
