@@ -10,7 +10,7 @@ export type CalculatorProblem = {
   id: string;
   title: string;
   level: "3級" | "2級";
-  type: "残高試算表" | "精算表" | "財務諸表";
+  type: "残高試算表" | "合計試算表" | "精算表" | "財務諸表" | "決算整理";
   description: string;
   transactions: {
     id: string;
